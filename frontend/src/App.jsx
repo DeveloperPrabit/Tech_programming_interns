@@ -1,11 +1,12 @@
-import React from 'react'
+import React from "react";
+import Home from "./pages/Home";
 
 const App = () => {
   return (
-   <>
-   <div className='flex justify-items-center text-30 bg-purple-500'>Welcome News Portal App :)</div>
-   </>
-  )
-}
+    <div>
+      <Home />
+    </div>
+  );
+};
 
-export default App
+export default App;
