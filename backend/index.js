@@ -2,7 +2,7 @@
 const express = require('express')
 const dotenv =require('dotenv');
 // const router = express.Router();
-
+const mongoose =require("mongoose");
 const indexRouter=require("./routes");
 
 dotenv.config();
@@ -13,6 +13,12 @@ app.use(express.urlencoded({extended:true}));
 
 app.use("/",indexRouter);
 
+mongoose.connect(process.env.DB_URL).then(()=>{
+  console.log("Database connected successfully"); 
+}).catch((err)=>{
+  console.log("Error connecting to database",err);
+  
+})
 
 app.use((req,res,next)=>{
   req.body.country="NP";

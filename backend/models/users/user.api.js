@@ -1,10 +1,12 @@
-
-const router=require("express").Router();
-const {mw} =require('../../utils/checkRole')
-const event=require('events');
-
-const {generateToken,verifyToken} = require('../../utils/token.js')
-const {sendMail} =require('../../services/mailer');
+const router = require("express").Router();
+const { mw } = require("../../utils/checkRole");
+// const event=require('events');
+const userContoller = require("./user.controller");
+const { generateToken, verifyToken } = require("../../utils/token");
+const { secureAPI } = require("../../utils/secure");
+const { validator } = require("./user.validator.js");
+const user = require("./user.model.js");
+// const {sendMail} =require('../../services/mailer');
 // const mw=(req,res,next)=>{ //route level middleware
 //     const {username,password}=req.headers;
 //     if(username === "ff" && password === ""){
@@ -12,66 +14,128 @@ const {sendMail} =require('../../services/mailer');
 //     }
 //     res.status(404).json({msg:"user unauthorized"});
 // }
-const eventEmitter= new event.EventEmitter();
 
-eventEmitter.addListener("signup",(email)=>{
-    sendMail({
-        email,
-        subject:"Welcome to our platform",
-        htmlMsg:"<b>Thank you for signing news app </b>",
-    })
+router.get("/", mw, (req, res, next) => {
+    try {
+        res.json({ msg: "user API is working" });
+    } catch (e) {
+        next(e);
+    }
 });
-router.get('/',mw,(req,res,next)=>{
-    try{
-        res.json({msg:"user API is working"});
-    } catch(e){
+
+router.post("/register", validator, (req, res, next) => {
+    async (req, res, next) => {
+        try {
+            console.log("dc");
+
+            const result = await userContoller.create(req.body);
+            // if(!email) throw new Error("Email  is missing"); //not required as we have already validated
+
+            //call the nodemailer
+            // eventEmitter.emit("signup",email);
+            res.json({ msg: "User Registered in successfully", data: result });
+        } catch (e) {
+            next(e);
+        }
+    };
+});
+router.post("/login", async (req, res, next) => {
+    try {
+        const result = await userContoller.login(req.body);
+        res.json({ msg: "User logged in successfully", data: result });
+    } catch (e) {
         next(e);
     }
-})
+});
 
-router.post('/register',(req,res,next)=>{
-    try{
-        const { email }= req.body;
-        if(!email) throw new Error("Email  is missing");
-        
-        //call the nodemailer
-        eventEmitter.emit("signup",email);
-        res.json({msg:"User Registered in successfully"});
- 
-    } 
-    catch (e){
-        next(e);
-
-    }
-})
-router.post("/login", (req,res,next)=>{
-    try{     
-       const {email,password}=req.body;
-       if(!email || !password) throw new Error("Email or password is missing")
-       if(email === "nabin@gmail.com" && password ==="1234"){
-        //generate token
-        const payload = { email, role: ["admin"] };
-        const token = generateToken(payload);
-        res.json({msg:"User logged in successfully", data:token});
-       }
-       res.json({msg:"User logged in successfully"});
-
-    } catch(e){
+router.post("/verify-email-token", async (req, res, next) => {
+    try {
+        const result = await userContoller.generateOtpToken(req.body);
+        res.json({ msg: "Email successfully verified", result: result });
+    } catch (e) {
         next(e);
     }
+});
+router.post("/generate-otp", (req, res, next) => {
+    try {
+        const result = userContoller.generateOtp(req.body);
+        res.json({ msg: "OTP sent successfully", result: result });
+    } catch (e) {
+        next(e);
+    }
+});
 
+router.get("/list", secureAPI(["admin"]), async (req, res, next) => {
+    try {
+        const data = await userContoller.list();
+
+        res.json({ msg: "User list generated successfully...", data: [] });
+    } catch (e) {
+        next(e);
+    }
+});
+
+router.patch("/:id/block", async (req, res, next) => {
+    try {
+        const payload = req.params.id;
+        const result = await userContoller.blocKUser(payload);
+        res.json({ msg: "User blocked successfully", data: result });
+
+
+    } catch (e) {
+        next(e)
+    }
 })
+router.delete("/:id/delete", (req, res, next) => {
+    try {
 
-router.get("/",(req,res,next)=>{
-    try{
-        res.json({msg:"User list generated successfully...",data:[]});
-    }catch(e)
-    {next(e);
 
+    } catch (e) {
+        next(e)
+    }
+})
+router.get("/profile", (req, res, next) => {
+    try {
+
+
+    } catch (e) {
+        next(e)
+    }
+})
+router.put("/profile", (req, res, next) => {
+    try {
+
+
+    } catch (e) {
+        next(e)
+    }
+})
+router.post("/change-password", (req, res, next) => {
+    try {
+
+
+    } catch (e) {
+        next(e)
+    }
+})
+router.post("/reset-password", (req, res, next) => {
+    try {
+
+
+    } catch (e) {
+        next(e)
     }
 })
 
-module.exports=router;
+router.post("/forget-password", (req, res, next) => {
+    try {
+
+
+    } catch (e) {
+        next(e)
+    }
+})
+module.exports = router;
 
 /*
 register

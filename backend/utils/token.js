@@ -1,16 +1,25 @@
-const JWT =require('jsonwebtoken');
 
-const generateToken=(payload)=>{
+const Crypto = require('crypto');
+const JWT = require("jsonwebtoken");
+
+const generateToken = (payload) =>
     JWT.sign(
         {
-            data:payload,
+            data: payload,
         },
         process.env.JWT_SECRET,
-        {expiresIN:process.env.JWT_DURATION}
-    )
+        { expiresIn: process.env.JWT_DURATION }
+    );
 
+
+
+const verifyToken = (token) => JWT.verify(token, process.env.JWT_SECRET);
+
+const checkRole = ({ sysRole, userRole }) =>
+    userRole.some((role) => sysRole.includes(role));
+
+const generateOtp = () => {
+    return crypto.radomInt(10000, 999999)
 };
 
-const verifyToken=(token) => JWT.verify(token, process.env.JWT_SECRET)
-
-module.exports= {generateToken ,verifyToken};
+module.exports = { generateToken, verifyToken, checkRole, generateOtp };

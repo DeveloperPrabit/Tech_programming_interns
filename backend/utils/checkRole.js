@@ -1,7 +1,7 @@
 
 // const {email,password}=
 
-const mw=(role)=>{  //middleware mah kashari headers rakhne.
+const mw=(rol)=>{  //middleware mah kashari headers rakhne.
     return (req,res,next)=>{ //route level middleware
         const {username,password}=req.headers;
         if(username === "ff" && password === ""){
