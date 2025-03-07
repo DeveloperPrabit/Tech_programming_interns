@@ -22,18 +22,16 @@ router.post('/create-article', async (req, res, next) => {
 
     }
 })
-router.get('/:id/update-article', async (req, res, next) => {
+router.put('/update-article/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const result = await articleController.update(id, req.body);
-        res.json({ msg: "updated article", data: result })
-        res.json({ msg: `update article.${id}` });
+        const { id } = req.params;  // Get the id from route params
+        const result = await articleController.updateOneArticle(req, res, next);
+        // No need to send another response here, since the controller already responds
     } catch (err) {
-        next(err)
-
+        next(err);  // Pass the error to the error handler
     }
 })
-router.get('/:id/get-one-article', (req, res, next) => {
+router.get('/get-one-article/:id', (req, res, next) => {
     try {
         const { id } = req.params;
         res.json({ msg: "get one article..." });
@@ -42,10 +40,10 @@ router.get('/:id/get-one-article', (req, res, next) => {
 
     }
 })
-router.delete('/:id/delete-article', async (req, res, next) => {
+router.delete('/delete-one-article/:id', async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const result = await articleController.delete(id)
+        // const { id } = req.params;
+        const result = await articleController.deleteOneArticle(req, res, next)
         res.json({ msg: "deleted one article...", data: result });
     } catch (err) {
         next(err)
@@ -80,15 +78,6 @@ router.patch('/:id/release-date', (req, res, next) => {
 
     }
 })
-// router.delete('/:id/seats',(req,res,next)=>{ //demo
-//     try{
-//         const {id}=req.params;
-//         res.json({msg:"deleted one article..."});
-//     } catch(err){
-//         next(err)
-
-//     }
-// })
 
 
 module.exports = router;

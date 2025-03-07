@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt');
-const { number } = require('joi');
+// const { number } = require('joi');
 
 const genHash = (payload) => {
-    return bcrypt.hashSync(payload, number(process.env.SALT_ROUND));
+    return bcrypt.hashSync(payload, Number(process.env.SALT_ROUND));
 };
 
 const compareHash = (hashPayload, payload) => {

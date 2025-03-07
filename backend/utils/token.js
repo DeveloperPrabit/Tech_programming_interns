@@ -19,7 +19,7 @@ const checkRole = ({ sysRole, userRole }) =>
     userRole.some((role) => sysRole.includes(role));
 
 const generateOtp = () => {
-    return crypto.radomInt(10000, 999999)
+    return Crypto.randomInt(10000, 999999)
 };
 
 module.exports = { generateToken, verifyToken, checkRole, generateOtp };

@@ -13,8 +13,9 @@ const userSchema = new Schema({
         required: true
     }],
     image: { String },
-    // isEmailVerified:{type:boolean,required:true}, //error this
-    isActive: { type: Boolean, default: true, default: true },
+    // isEmailVerified: { type: boolean, required: true }, //error this
+    isActive: { type: Boolean, default: true },
+    isEmailVerified: { type: Boolean, required: true, default: false },
     otp: { type: String },
 },
     { timestamps: true }

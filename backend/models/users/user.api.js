@@ -1,8 +1,7 @@
 const router = require("express").Router();
-const { mw } = require("../../utils/checkRole");
-// const event=require('events');
+// const { mw } = require("../../utils/checkRole");
 const userContoller = require("./user.controller");
-const { generateToken, verifyToken } = require("../../utils/token");
+// const { generateToken, verifyToken } = require("../../utils/token");
 const { secureAPI } = require("../../utils/secure");
 const { validator } = require("./user.validator.js");
 const user = require("./user.model.js");
@@ -15,29 +14,25 @@ const user = require("./user.model.js");
 //     res.status(404).json({msg:"user unauthorized"});
 // }
 
-router.get("/", mw, (req, res, next) => {
+// router.get("/", mw, (req, res, next) => {
+//     try {
+//         res.json({ msg: "user API is working" });
+//     } catch (e) {
+//         next(e);
+//     }
+// });
+
+router.post("/register", validator, async (req, res, next) => {
     try {
-        res.json({ msg: "user API is working" });
+
+        const result = await userContoller.create(req.body);
+        // if(!email) throw new Error("Email  is missing"); //not required as we have already validated
+
+        res.json({ msg: "User Registered in successfully", data: result });
     } catch (e) {
         next(e);
     }
-});
 
-router.post("/register", validator, (req, res, next) => {
-    async (req, res, next) => {
-        try {
-            console.log("dc");
-
-            const result = await userContoller.create(req.body);
-            // if(!email) throw new Error("Email  is missing"); //not required as we have already validated
-
-            //call the nodemailer
-            // eventEmitter.emit("signup",email);
-            res.json({ msg: "User Registered in successfully", data: result });
-        } catch (e) {
-            next(e);
-        }
-    };
 });
 router.post("/login", async (req, res, next) => {
     try {
@@ -50,7 +45,7 @@ router.post("/login", async (req, res, next) => {
 
 router.post("/verify-email-token", async (req, res, next) => {
     try {
-        const result = await userContoller.generateOtpToken(req.body);
+        const result = await userContoller.verifyEmailToken(req.body);
         res.json({ msg: "Email successfully verified", result: result });
     } catch (e) {
         next(e);
@@ -58,16 +53,17 @@ router.post("/verify-email-token", async (req, res, next) => {
 });
 router.post("/generate-otp", (req, res, next) => {
     try {
-        const result = userContoller.generateOtp(req.body);
+        const result = userContoller.generateOtpToken(req.body);
         res.json({ msg: "OTP sent successfully", result: result });
     } catch (e) {
         next(e);
     }
 });
 
+
 router.get("/list", secureAPI(["admin"]), async (req, res, next) => {
     try {
-        const data = await userContoller.list();
+        const data = await userContoller.list(); // login garea headers mah token pani pathune
 
         res.json({ msg: "User list generated successfully...", data: [] });
     } catch (e) {
