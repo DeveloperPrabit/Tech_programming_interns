@@ -30,7 +30,7 @@ const create = async (payload) => {
 
     const result = await userModel.create(payload);
     //call the nodemailer
-    eventEmitter.emit("signup", email);
+    // eventEmitter.emit("signup", email);
     return result;
 };
 const login = async (payload) => {
@@ -48,7 +48,6 @@ const login = async (payload) => {
     const tokenPayload = {
         name: user?.name,
         email: user?.email,
-        roles: user?.roles
     };
     const token = generateToken(tokenPayload);
     if (!token) throw new Error("Something went wrong");
@@ -68,7 +67,7 @@ const generateOtpToken = async (payload) => { //if user aaja verify nagare paxi 
         const updateduser = await userModel.updateOne({ _id: user?.id }, { otp });
         if (!updateduser) throw new Error("Something went wrong");
 
-        eventEmitter.emit("emailVerification", email, otp); //incomplete
+        // eventEmitter.emit("emailVerification", email, otp); //incomplete
     }
     return true;
 
@@ -113,9 +112,87 @@ const blocKUser = async (payload) => { // yasma paila token ra id pathayera bloc
     return true;
 };
 
-const updateById = (id, payload) => { };
+const updateById = (id, payload) => {
 
-const removeById = (id) => { };
+    return userModel.findOneAndUpdate({ _id: id }, payload, { new: true });//naya data back din eho vaneko ho yo new:true vaneko.
+};
+const getProfile = (_id) => {
+    return userModel.findOne({ _id });
+}
+
+const removeById = (id) => {
+    return userModel.deleteOne({ _id: id });
+};
+
+const updateProfile = (_id, payload) => { };
+
+const changePassword = async (id, payload) => {
+    //get old password the user
+    const user = await userModel.findOne({
+        _id: id,
+        isActive: true,
+        isEmailVerified: true,
+    }).select("+password");
+    if (!user) throw new Error("User not found");
+    //comapre that password to usert database
+    const isValidPw = compareHash(user?.password, oldPassword);
+    if (!isValidPw) throw new Error("Password mismatch");
+    //convert newPassword to hashPassword
+    const data = {
+        password: genHash(newPassword),
+    };
+    //store that password in database
+
+    return userModel.updateOne({ _id: id }, payload);
+};
+
+const resetPassword = async (id, newPassword) => {
+
+    //user exists
+    const user = await userModel.findOne({ _id: id });
+    if (!user) throw new Error("User not found");
+    //new password hash
+    const hashPw = genHash(payload?.newPassword);
+    //user update
+    return userModel.updateOne({ _id: id }, { password: hashPw });
+}
+
+const forgetPasswordTOkenGen = async (payload) => { //work
+    const { email } = payload;
+    //find user
+    const user = await userModel.findOne({
+        email,
+        isActive: true,
+        isEmailVerified: true,
+    });
+    if (!user) throw new Error("User not found");
+    //generate token for reset password
+    const otp = generateOtp();
+    console.log({ otp });
+    //store token in database
+    const updatedUser = await userModel.updateOne({ email }, { otp });
+    if (!updatedUser) throw new Error("User not found");
+    //send token to user email
+    // eventEmitter.emit("Email verification", email, otp);
+    return true;
+}
+
+const forgetPasswordPassChange = async (payload) => { //work
+    const { email, otp, newPassword } = payload;
+    //find user
+    const user = await userModel.findOne({
+        email,
+        isActive: true,
+        isEmailVerified: true,
+        otp,
+    });
+    if (!user) throw new Error("User not found");
+    if (otp !== user?.otp) throw new Error("OTP mismatch");
+    const hashPw = genHash(newPassword);
+    const updatedUser = await userModel.updateOne({ email }, { password: hashPw, otp: "" });
+    if (!updatedUser) throw new Error("Something went wrong");
+    return true;
+}
 
 module.exports = {
     create,
@@ -125,8 +202,13 @@ module.exports = {
     getById,
     list,
     blocKUser,
+    getProfile,
     updateById,
     removeById,
-
+    updateProfile,
+    changePassword,
+    resetPassword,
+    forgetPasswordTOkenGen,
+    forgetPasswordPassChange
 
 }

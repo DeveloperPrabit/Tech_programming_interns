@@ -1,7 +1,7 @@
 import React from "react";
 import "./Forget.css";
 
-const Forget = () => {
+const ForgetPassword = () => {
   return (
     <div className="forget-container">
       <div className="forget-box">
@@ -30,4 +30,4 @@ const Forget = () => {
   );
 };
 
-export default Forget;
+export default ForgetPassword;

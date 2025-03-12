@@ -49,11 +49,34 @@ User Email verification
 
 # user list (admin)
 
+- find()
+  -secure pass admin as sys role
+  -select false
+
 # user block (admin)
+
+-blockUser method
+-user findOne({\_id:id})
+-use opposite of user isActive status
+-user updateOne()
 
 # user delete (admin)
 
+-secure admin only
+-user findOne()
+-user deleteOne({\_id:id})
+
 # user profile (admin, user)
+
+-secureAPI()
+-checkRole update for sysRole empty condition
+-secure token only {name,email}
+-token bcrypt
+-use email to find user details (isActive:true,isEmailVerified;true)
+-user ROle and pass it to checkRole
+-user id =>req.currentUser
+if get profile
+req.headers => token(email,roles)
 
 # get user details (admin)
 

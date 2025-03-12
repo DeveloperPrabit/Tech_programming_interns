@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const env = require('dotenv');
 
 const transporter = nodemailer.createTransport({
     pool: true,
@@ -14,12 +13,12 @@ const transporter = nodemailer.createTransport({
         // pass: "Prabit@123"
     },
 })
-const sendMail = async (email, subject, htmlMsg) => {
+const sendMail = async ({ email, subject, htmlMsg }) => {
     const { messageId } = await transporter.sendMail({
         from: '"Nabin "<adhiainabin2060@gmail.com>',
         to: email,
         subject,
-        htmlMsg,
+        html: htmlMsg,
     });
     return messageId;
 

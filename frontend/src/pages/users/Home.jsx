@@ -3,7 +3,7 @@ import "./Home.css";
 
 const Home = () => {
   return (
-    <div className="home">
+    <div className="home mt-32">
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
@@ -116,7 +116,7 @@ const Home = () => {
             "Sports",
             "Entertainment",
             "Business",
-            "Health",
+            "Health"
           ].map((category) => (
             <div key={category} className="category-card">
               <h3>{category}</h3>

@@ -71,7 +71,7 @@ router.get("/list", secureAPI(["admin"]), async (req, res, next) => {
     }
 });
 
-router.patch("/:id/block", async (req, res, next) => {
+router.patch("/:id/block", secureAPI(["admin"]), async (req, res, next) => {
     try {
         const payload = req.params.id;
         const result = await userContoller.blocKUser(payload);
@@ -82,50 +82,80 @@ router.patch("/:id/block", async (req, res, next) => {
         next(e)
     }
 })
-router.delete("/:id/delete", (req, res, next) => {
+router.delete("/:id", async (req, res, next) => { //working
     try {
-
+        const result = await userContoller.removeById(req.params.id);
+        res.json({ msg: "User Deleted successfully", data: result });
 
     } catch (e) {
         next(e)
     }
 })
-router.get("/profile", (req, res, next) => {
+router.get("/profile", secureAPI(), async (req, res, next) => {
     try {
-
-
+        const result = await userContoller.getProfile(req.currentUser);
+        res.json({ msg: "User profile generated successfully", data: result });
     } catch (e) {
         next(e)
     }
 })
-router.put("/profile", (req, res, next) => {
+router.put("/profile", secureAPI(), async (req, res, next) => {
     try {
-
-
-    } catch (e) {
-        next(e)
-    }
-})
-router.post("/change-password", (req, res, next) => {
-    try {
-
-
-    } catch (e) {
-        next(e)
-    }
-})
-router.post("/reset-password", (req, res, next) => {
-    try {
-
+        const result = await userContoller.updateProfile(req.currentUser, req.body);
+        res.json({ msg: "Profile updated successfully", data: result });
 
     } catch (e) {
         next(e)
     }
 })
 
-router.post("/forget-password", (req, res, next) => {
+router.get("/:id", secureAPI(["admin"]), async (req, res, next) => {
     try {
 
+        const result = await userContoller.getById(req.params.id);
+        res.json({ msg: "User details generated.", data: result });
+    } catch (e) {
+        next(e)
+    }
+})
+
+router.post("/change-password", secureAPI(["admin", "user"]), async (req, res, next) => {
+    try {
+        const result = await userContoller.changePassword(
+            req.currentUser,
+            req.body
+        );
+        res.json({ msg: "Password changed successfully", data: result });
+
+    } catch (e) {
+        next(e)
+    }
+})
+router.post("/reset-password", secureAPI(["admin"]), validator, async (req, res, next) => {
+    try {
+        const { id, newPassword } = req.body;
+        if (!id || !newPassword) throw new Error("Id or newPassword is missing");
+        const result = await userContoller.resetPassword(id, newPassword);
+        res.json({ msg: "Password reset successfully", data: result });
+
+    } catch (e) {
+        next(e)
+    }
+})
+
+router.post("/forget-password", async (req, res, next) => {
+    try {
+        const result = await userContoller.forgetPasswordTOkenGen(req.body);
+        res.json({ msg: "Forget password token generated successfully", data: result });
+
+    } catch (e) {
+        next(e)
+    }
+})
+router.post("/forget-password-change", async (req, res, next) => {
+    try {
+        const result = await userContoller.forgetPasswordPassChange(req.body);
+        res.json({ msg: "New Password change successfully", data: result });
 
     } catch (e) {
         next(e)

@@ -1,36 +1,38 @@
 
 const express = require('express')
-const dotenv =require('dotenv');
+const dotenv = require('dotenv');
+const cors = require("cors");
 // const router = express.Router();
-const mongoose =require("mongoose");
-const indexRouter=require("./routes");
+const mongoose = require("mongoose");
+const indexRouter = require("./routes");
 
 dotenv.config();
 const app = express()
-const PORT =process.env.PORT || 7000;
+const PORT = process.env.PORT || 7000;
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/",indexRouter);
+app.use("/", indexRouter);
 
-mongoose.connect(process.env.DB_URL).then(()=>{
-  console.log("Database connected successfully"); 
-}).catch((err)=>{
-  console.log("Error connecting to database",err);
-  
+mongoose.connect(process.env.DB_URL).then(() => {
+  console.log("Database connected successfully");
+}).catch((err) => {
+  console.log("Error connecting to database", err);
+
 })
 
-app.use((req,res,next)=>{
-  req.body.country="NP";
-  req,body.currenTime=new Date();
+app.use((req, res, next) => {
+  req.body.country = "NP";
+  req, body.currenTime = new Date();
   next(); //also used ip address pckg-ip,ip-address
 })
 
 //error handling middleware
-app.use((err,req,res,next)=>{
+app.use((err, req, res, next) => {
   const erroMsg = err ? err.toString() : "Something Went Wrong";
-  res.status(500).json({msg:erroMsg});
-  
+  res.status(500).json({ msg: erroMsg });
+
 })
 
 
